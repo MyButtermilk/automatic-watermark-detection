@@ -61,6 +61,48 @@ Disclaimer
 --------
 I do not encourage or endorse piracy by making this project public. The code is free for academic/research purpose. Please feel free to send pull requests for bug fixes/optimizations, etc.
 
+## OCR Functionality
+
+This project also includes a FastAPI application (`ocr_app.py`) that provides OCR (Optical Character Recognition) functionality for PDF files. It uses the NVIDIA NeMo Retriever OCR v1 microservice to extract text from each page of a PDF and generate a searchable PDF.
+
+### Usage
+
+This application provides OCR (Optical Character Recognition) functionality for PDF files using two different OCR models: NVIDIA NeMo Retriever OCR v1 and Tesseract.
+
+#### OCR Models
+
+*   **NVIDIA NeMo Retriever OCR v1:** A powerful OCR model from NVIDIA, optimized for English.
+*   **Tesseract:** A popular open-source OCR engine that supports a wide range of languages.
+
+You can select the desired OCR model when you make a request to the `/ocr-pdf/` endpoint.
+
+#### Running the Application
+
+1.  **NVIDIA Model (Optional):** If you want to use the NVIDIA model, you need to have the NVIDIA NeMo Retriever OCR v1 microservice running. You can find instructions on how to run it in the [NVIDIA documentation](https://docs.nvidia.com/nim/ingestion/image-ocr/1.0.0/getting-started.html). By default, the application expects the service to be at `http://localhost:8080/v1/infer`. You can override this by setting the `NVIDIA_OCR_URL` environment variable.
+
+2.  **Tesseract Model (Optional):** If you want to use the Tesseract model, you need to have Tesseract OCR installed on your system. You can find installation instructions on the [official Tesseract website](https://github.com/tesseract-ocr/tesseract).
+
+3.  **Start the FastAPI Application:**
+    ```bash
+    uvicorn ocr_app:app --host 0.0.0.0 --port 8000
+    ```
+
+#### Making a Request
+
+You can send a POST request to the `/ocr-pdf/` endpoint with a PDF file and the desired OCR model.
+
+**Example using cURL:**
+
+*   **NVIDIA Model:**
+    ```bash
+    curl -X POST -F "file=@/path/to/your/file.pdf" -F "ocr_model=nvidia" http://localhost:8000/ocr-pdf/
+    ```
+
+*   **Tesseract Model (for German):**
+    ```bash
+    curl -X POST -F "file=@/path/to/your/file.pdf" -F "ocr_model=tesseract" -F "lang=deu" http://localhost:8000/ocr-pdf/
+    ```
+
 
 
 
