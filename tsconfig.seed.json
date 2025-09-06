@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "outDir": "./prisma",
+    "noEmit": false
+  },
+  "include": ["prisma/seed.ts"]
+}

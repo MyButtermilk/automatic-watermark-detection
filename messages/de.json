@@ -1,0 +1,35 @@
+{
+  "LoginPage": {
+    "title": "Login",
+    "description": "Willkommen zurück im Club.",
+    "emailLabel": "Email",
+    "passwordLabel": "Passwort",
+    "button": "Login",
+    "buttonPending": "Logge ein...",
+    "noAccount": "Noch kein Mitglied?",
+    "signupLink": "Registrieren"
+  },
+  "SignupPage": {
+    "title": "Registrieren",
+    "description": "Werde Teil des Clubs.",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "passwordLabel": "Passwort",
+    "button": "Registrieren",
+    "buttonPending": "Registriere...",
+    "hasAccount": "Schon Mitglied?",
+    "loginLink": "Login"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "login": "Login",
+    "signup": "Registrieren",
+    "logout": "Logout"
+  },
+  "AuthErrors": {
+    "CredentialsSignin": "Ungültige Anmeldeinformationen.",
+    "Default": "Etwas ist schief gelaufen.",
+    "UserExists": "Ein Benutzer mit dieser E-Mail existiert bereits.",
+    "DatabaseError": "Datenbankfehler: Benutzer konnte nicht erstellt werden."
+  }
+}

@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// AUTH MODELS (compatible with NextAuth.js)
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?   // For optional avatar
+  passwordHash  String?   // Not part of standard next-auth, for CredentialsProvider
+
+  // Stored as a String, validated by the application. Values: "ADMIN", "MEMBER"
+  role          String    @default("MEMBER")
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  accounts      Account[]
+  sessions      Session[]
+
+  // App-specific relations
+  RSVPs           RSVP[]
+  cookAssignments CookAssignment[]
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+
+// APPLICATION MODELS
+
+model Event {
+  id             String            @id @default(cuid())
+  date           DateTime          @unique
+  title          String            @default("Sauna Boys – Kochabend")
+  location       String            @default("Bei Niko")
+  recipeId       String?           @unique
+  recipe         Recipe?           @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  cookAssignment CookAssignment?
+  RSVPs          RSVP[]
+  shoppingItems  ShoppingItem[]
+  galleryItems   GalleryItem[]
+}
+
+model CookAssignment {
+  id        String   @id @default(cuid())
+  eventId   String   @unique
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model RSVP {
+  id      String   @id @default(cuid())
+  eventId String
+  event   Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Stored as a String, validated by the application. Values: "YES", "NO", "MAYBE"
+  status  String
+  updatedAt DateTime @updatedAt
+
+  @@unique([eventId, userId])
+}
+
+model ShoppingItem {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name      String
+  quantity  String?
+  unit      String?
+  purchased Boolean  @default(false)
+  createdBy String   // As per spec, could be a User relation
+}
+
+model Recipe {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  // Stored as a JSON string for simplicity.
+  ingredients String
+  // Stored as a JSON string for simplicity.
+  steps       String
+  event       Event?
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  publicId  String // Cloudinary public_id
+  url       String
+  caption   String?
+  createdBy String   // As per spec, could be a User relation
+}
