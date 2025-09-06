@@ -17,7 +17,7 @@ test.describe('Authentication Flow', () => {
     await page.getByLabel('Name').fill(newUser.name);
     await page.getByLabel('Email').fill(newUser.email);
     await page.getByLabel('Passwort').fill(newUser.password);
-    await page.getByRole('button', { name: 'Registrieren' }).click();
+    await page.getByRole('main').getByRole('button', { name: 'Registrieren' }).click();
 
     // After signup, user is redirected to login page with a success message
     // The redirect might take a moment, so we wait for the URL to change.

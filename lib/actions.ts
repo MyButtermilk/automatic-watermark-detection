@@ -2,9 +2,9 @@
 
 import { signIn, auth } from '@/auth';
 import { AuthError } from 'next-auth';
-import { getTranslator } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { revalidatePath } from 'next/cache';
-import prisma, { Prisma } from './prisma';
+import prisma from './prisma';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
@@ -19,27 +19,34 @@ export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
 ) {
-  const t = await getTranslator('de', 'AuthErrors');
+  const t = await getTranslations({ locale: 'de', namespace: 'AuthErrors' });
   try {
-    await signIn('credentials', formData);
+    const { email, password } = Object.fromEntries(formData.entries()) as {
+      email: string;
+      password: string;
+    };
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+    if (result?.error) {
+      return t('CredentialsSignin');
+    }
   } catch (error) {
     if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return t('CredentialsSignin');
-        default:
-          return t('Default');
-      }
+      return t('Default');
     }
     throw error;
   }
+  redirect('/dashboard');
 }
 
 export async function signup(
   prevState: string | undefined,
   formData: FormData,
 ) {
-  const t = await getTranslator('de', 'AuthErrors');
+  const t = await getTranslations({ locale: 'de', namespace: 'AuthErrors' });
   const validatedFields = SignupFormSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
@@ -363,7 +370,7 @@ export async function clearCookAssignment(eventId: string) {
     return { success: true };
   } catch (error) {
     // It's possible no assignment exists, so we can ignore "not found" errors.
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+    if ((error as any)?.code === 'P2025') {
       revalidatePath('/admin');
       return { success: true, message: 'Keine Zuweisung zum Entfernen gefunden.' };
     }
