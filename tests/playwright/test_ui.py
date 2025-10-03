@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -7,8 +8,15 @@ import urllib.request
 import wave
 from pathlib import Path
 
-import numpy as np
 import pytest
+
+pytest.importorskip("numpy")
+pytest.importorskip("playwright.sync_api")
+
+if shutil.which("streamlit") is None:
+    pytest.skip("Streamlit command not available", allow_module_level=True)
+
+import numpy as np
 from playwright.sync_api import expect, sync_playwright
 
 STREAMLIT_PORT = 8501
